@@ -60,8 +60,7 @@
     <p class="sub">Paste your meeting link, enter a name, and create a personalized link to copy or share on WhatsApp.</p>
 
     <label for="meeting">Zoom Meeting Link</label>
-    <input id="meeting" type="url" placeholder="https://zoom.us/j/..." autocomplete="url"
-      value="https://us06web.zoom.us/j/5599500900?pwd=UayKbSLgNR7zvpSbj5THQ6xwD7Gatq.1">
+    <input id="meeting" type="url" placeholder="https://zoom.us/j/..." autocomplete="url">
 
     <label for="person">Person's Name</label>
     <input id="person" type="text" placeholder="e.g. NEWHardik Nandha" maxlength="100" autocomplete="name">
@@ -78,54 +77,4 @@
 
     <div class="notice">
       This page creates the link in your browser. It does not save or send your meeting link or name to a server.
-      The <b>uname</b> parameter is included in the URL format you requested; Zoom may not use it to prefill the participant name in every app or browser. Participants may still need to enter their name when joining.
-    </div>
-  </main>
-
-  <script>
-    const meeting = document.getElementById('meeting');
-    const person = document.getElementById('person');
-    const output = document.getElementById('output');
-    const generatedEl = document.getElementById('generated');
-    let generatedUrl = '';
-
-    function buildLink() {
-      const raw = meeting.value.trim();
-      const name = person.value.trim();
-      if (!raw) { alert('Please paste your Zoom meeting link.'); meeting.focus(); return; }
-      if (!name) { alert("Please enter the person's name."); person.focus(); return; }
-
-      let parsed;
-      try { parsed = new URL(raw); }
-      catch { alert('Please enter a valid Zoom URL.'); meeting.focus(); return; }
-
-      if (!/^https?:$/.test(parsed.protocol) || !/(^|\.)zoom\.us$/i.test(parsed.hostname)) {
-        alert('Please enter a valid zoom.us meeting link.');
-        meeting.focus(); return;
-      }
-
-      parsed.searchParams.set('uname', name);
-      generatedUrl = parsed.toString();
-      generatedEl.textContent = generatedUrl;
-      document.getElementById('share').href =
-        'https://wa.me/?text=' + encodeURIComponent('Join Zoom Meeting:\n' + generatedUrl);
-      output.classList.remove('hidden');
-    }
-
-    document.getElementById('generate').addEventListener('click', buildLink);
-    document.getElementById('copy').addEventListener('click', async () => {
-      if (!generatedUrl) return;
-      try {
-        await navigator.clipboard.writeText(generatedUrl);
-        document.getElementById('copy').textContent = 'Copied!';
-        setTimeout(() => document.getElementById('copy').textContent = 'Copy Zoom Link', 1800);
-      } catch {
-        alert('Copy was blocked by your browser. Please select and copy the link manually.');
-      }
-    });
-    [meeting, person].forEach(el => el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') buildLink();
-    }));
-  </script>
-</body>
-</html>
+      The
