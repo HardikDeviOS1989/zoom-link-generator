@@ -10,29 +10,45 @@
     body {
       margin: 0; min-height: 100vh; padding: 24px 16px;
       display: grid; place-items: center;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Gujarati", "Noto Sans Devanagari", sans-serif;
       background: linear-gradient(145deg, #eaf3ff, #f7f9fc 55%, #eef5ff);
       color: #172033;
     }
     .card {
-      width: min(100%, 520px); background: #fff; border: 1px solid #e5eaf2;
+      width: min(100%, 540px); background: #fff; border: 1px solid #e5eaf2;
       border-radius: 24px; padding: 28px; box-shadow: 0 18px 55px rgba(25, 65, 120, .10);
     }
-    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .top-bar {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap; margin-bottom: 8px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
     .logo {
       width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px;
-      color: white; background: #1769e0; font-size: 23px;
+      color: white; background: #1769e0; font-size: 23px; flex-shrink: 0;
     }
-    h1 { font-size: 24px; margin: 0; letter-spacing: -.5px; }
-    .sub { margin: 0 0 25px; color: #667085; font-size: 14px; line-height: 1.5; }
+    h1 { font-size: 23px; margin: 0; letter-spacing: -.4px; }
+    .lang-switch {
+      display: inline-flex; background: #f1f5fa; border: 1px solid #dce4f0;
+      border-radius: 11px; padding: 3px; gap: 3px;
+    }
+    .lang-btn {
+      border: 0; background: transparent; color: #475467; font: inherit;
+      font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px;
+      cursor: pointer; transition: .15s ease;
+    }
+    .lang-btn.active {
+      background: #1769e0; color: #fff; box-shadow: 0 2px 6px rgba(23, 105, 224, .25);
+    }
+    .sub { margin: 0 0 22px; color: #667085; font-size: 14px; line-height: 1.55; }
     label { display: block; font-size: 14px; font-weight: 650; margin: 17px 0 8px; }
     input {
       width: 100%; border: 1px solid #d7deea; border-radius: 12px; padding: 14px;
       font: inherit; font-size: 15px; outline: none; background: #fff;
     }
     input:focus { border-color: #1769e0; box-shadow: 0 0 0 3px rgba(23,105,224,.12); }
-    .hint { color: #7b8494; font-size: 12px; margin-top: 7px; }
-    button, a.action {
+    .hint { color: #7b8494; font-size: 12px; margin-top: 7px; line-height: 1.45; }
+    button.main-btn, a.action {
       width: 100%; display: flex; align-items: center; justify-content: center; gap: 9px;
       border: 0; border-radius: 12px; padding: 14px 16px; font: inherit;
       font-weight: 700; font-size: 15px; cursor: pointer; text-decoration: none;
@@ -46,85 +62,217 @@
     .result { margin-top: 22px; padding: 16px; border-radius: 14px; background: #f5f8fc; border: 1px solid #e6edf6; }
     .result-title { font-size: 12px; text-transform: uppercase; letter-spacing: .7px; color: #16834a; font-weight: 800; }
     #generated { margin: 9px 0 2px; overflow-wrap: anywhere; font-size: 13px; line-height: 1.55; color: #344054; }
-    .notice { margin-top: 18px; padding-top: 14px; border-top: 1px solid #edf0f4; color: #7b8494; font-size: 11px; line-height: 1.5; }
+    .notice { margin-top: 18px; padding-top: 14px; border-top: 1px solid #edf0f4; color: #7b8494; font-size: 11px; line-height: 1.55; }
     .hidden { display: none; }
-    @media (max-width: 420px) { .card { padding: 22px 18px; border-radius: 20px; } h1 { font-size: 21px; } }
+    @media (max-width: 460px) {
+      .card { padding: 22px 18px; border-radius: 20px; }
+      h1 { font-size: 20px; }
+      .top-bar { flex-direction: column; align-items: stretch; }
+      .lang-switch { align-self: flex-start; }
+    }
   </style>
 </head>
 <body>
   <main class="card">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">↗</div>
-      <h1>Zoom Link Generator</h1>
+    <div class="top-bar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">↗</div>
+        <h1 id="title">Zoom Link Generator</h1>
+      </div>
+      <div class="lang-switch" role="group" aria-label="Language selector">
+        <button type="button" class="lang-btn active" data-lang="en">English</button>
+        <button type="button" class="lang-btn" data-lang="gu">ગુજરાતી</button>
+        <button type="button" class="lang-btn" data-lang="hi">हिन्दी</button>
+      </div>
     </div>
-    <p class="sub">Paste your meeting link, enter a name, and create a personalized link to copy or share on WhatsApp.</p>
 
-    <label for="meeting">Zoom Meeting Link</label>
+    <p class="sub" id="subtitle">Paste your meeting link, enter a name, and create a personalized link to copy or share on WhatsApp.</p>
+
+    <label for="meeting" id="labelMeeting">Zoom Meeting Link</label>
     <input id="meeting" type="url" placeholder="https://zoom.us/j/..." autocomplete="url">
 
-    <label for="person">Person's Name</label>
-    <input id="person" type="text" placeholder="e.g. NEWHardik Nandha" maxlength="100" autocomplete="name">
-    <div class="hint">The name will be added as the <b>uname</b> parameter.</div>
+    <label for="person" id="labelPerson">Person's Name</label>
+    <input id="person" type="text" placeholder="e.g. Hardik Nandha" maxlength="100" autocomplete="name">
+    <div class="hint" id="hintName">The name will be added as the <b>uname</b> parameter.</div>
 
-    <button class="primary" id="generate">Generate Zoom Link</button>
+    <button type="button" class="main-btn primary" id="generate">Generate Zoom Link</button>
 
     <section id="output" class="result hidden" aria-live="polite">
-      <div class="result-title">Your personalized Zoom link</div>
+      <div class="result-title" id="resultTitle">Your personalized Zoom link</div>
       <div id="generated"></div>
-      <button class="secondary" id="copy">Copy Zoom Link</button>
+      <button type="button" class="main-btn secondary" id="copy">Copy Zoom Link</button>
       <a class="action whatsapp" id="share" href="#" target="_blank" rel="noopener">Share on WhatsApp</a>
     </section>
 
-    <div class="notice">
+    <div class="notice" id="noticeText">
       This page creates the link in your browser. It does not save or send your meeting link or name to a server.
       The <b>uname</b> parameter is included in the URL format you requested; Zoom may not use it to prefill the participant name in every app or browser. Participants may still need to enter their name when joining.
     </div>
   </main>
 
   <script>
+    const translations = {
+      en: {
+        pageTitle: 'Zoom Link Generator',
+        title: 'Zoom Link Generator',
+        subtitle: 'Paste your meeting link, enter a name, and create a personalized link to copy or share on WhatsApp.',
+        labelMeeting: 'Zoom Meeting Link',
+        placeholderMeeting: 'https://zoom.us/j/...',
+        labelPerson: "Person's Name",
+        placeholderPerson: 'e.g. Hardik Nandha',
+        hintName: 'The name will be added as the <b>uname</b> parameter.',
+        generate: 'Generate Zoom Link',
+        resultTitle: 'Your personalized Zoom link',
+        copy: 'Copy Zoom Link',
+        copied: 'Copied!',
+        share: 'Share on WhatsApp',
+        waPrefix: 'Join Zoom Meeting:\n',
+        notice: 'This page creates the link in your browser. It does not save or send your meeting link or name to a server. The <b>uname</b> parameter is included in the URL format you requested; Zoom may not use it to prefill the participant name in every app or browser. Participants may still need to enter their name when joining.',
+        errEmptyLink: 'Please paste your Zoom meeting link.',
+        errEmptyName: "Please enter the person's name.",
+        errInvalidUrl: 'Please enter a valid Zoom URL.',
+        errNotZoom: 'Please enter a valid zoom.us meeting link.',
+        errCopy: 'Copy was blocked by your browser. Please select and copy the link manually.'
+      },
+      gu: {
+        pageTitle: 'ઝૂમ લિંક જનરેટર',
+        title: 'ઝૂમ લિંક જનરેટર',
+        subtitle: 'મીટિંગ લિંક પેસ્ટ કરો, નામ લખો અને કોપી કરવા અથવા WhatsApp પર શેર કરવા માટે પર્સનલાઇઝ્ડ લિંક બનાવો.',
+        labelMeeting: 'ઝૂમ મીટિંગ લિંક',
+        placeholderMeeting: 'https://zoom.us/j/...',
+        labelPerson: 'વ્યક્તિનું નામ',
+        placeholderPerson: 'દા.ત. હાર્દિક નંદા',
+        hintName: 'નામ <b>uname</b> પેરામીટર તરીકે લિંકમાં ઉમેરાશે.',
+        generate: 'ઝૂમ લિંક બનાવો',
+        resultTitle: 'તમારી તૈયાર ઝૂમ લિંક',
+        copy: 'ઝૂમ લિંક કોપી કરો',
+        copied: 'કોપી થઈ ગઈ!',
+        share: 'WhatsApp પર શેર કરો',
+        waPrefix: 'ઝૂમ મીટિંગમાં જોડાઓ:\n',
+        notice: 'આ પેજ તમારા બ્રાઉઝરમાં જ લિંક બનાવે છે; તમારી મીટિંગ લિંક કે નામ કોઈ સર્વર પર સેવ કે મોકલવામાં આવતા નથી. <b>uname</b> પેરામીટર તમે માંગેલા URL ફોર્મેટ મુજબ ઉમેરવામાં આવે છે; દરેક એપ કે બ્રાઉઝરમાં Zoom આપમેળે નામ ભરે તે જરૂરી નથી, જોડાતી વખતે નામ લખવું પડી શકે છે.',
+        errEmptyLink: 'કૃપા કરીને ઝૂમ મીટિંગ લિંક પેસ્ટ કરો.',
+        errEmptyName: 'કૃપા કરીને વ્યક્તિનું નામ લખો.',
+        errInvalidUrl: 'કૃપા કરીને માન્ય Zoom URL દાખલ કરો.',
+        errNotZoom: 'કૃપા કરીને માન્ય zoom.us મીટિંગ લિંક દાખલ કરો.',
+        errCopy: 'તમારા બ્રાઉઝરે કોપી કરવાની મંજૂરી આપી નથી. કૃપા કરીને લિંક સિલેક્ટ કરીને મેન્યુઅલી કોપી કરો.'
+      },
+      hi: {
+        pageTitle: 'ज़ूम लिंक जनरेटर',
+        title: 'ज़ूम लिंक जनरेटर',
+        subtitle: 'मीटिंग लिंक पेस्ट करें, नाम लिखें और कॉपी करने या WhatsApp पर शेयर करने के लिए पर्सनलाइज़्ड लिंक बनाएं।',
+        labelMeeting: 'ज़ूम मीटिंग लिंक',
+        placeholderMeeting: 'https://zoom.us/j/...',
+        labelPerson: 'व्यक्ति का नाम',
+        placeholderPerson: 'उदा. हार्दिक नंधा',
+        hintName: 'नाम लिंक में <b>uname</b> पैरामीटर के रूप में जुड़ जाएगा।',
+        generate: 'ज़ूम लिंक बनाएं',
+        resultTitle: 'आपका तैयार ज़ूम लिंक',
+        copy: 'ज़ूम लिंक कॉपी करें',
+        copied: 'कॉपी हो गया!',
+        share: 'WhatsApp पर शेयर करें',
+        waPrefix: 'ज़ूम मीटिंग जॉइन करें:\n',
+        notice: 'यह पेज आपके ब्राउज़र में ही लिंक बनाता है; आपका मीटिंग लिंक या नाम किसी सर्वर पर सेव या भेजा नहीं जाता है। <b>uname</b> पैरामीटर आपके द्वारा बताए गए URL फ़ॉर्मेट के अनुसार जोड़ा जाता है; हर ऐप या ब्राउज़र में Zoom अपने आप नाम भरे यह ज़रूरी नहीं है, जॉइन करते समय नाम दर्ज करना पड़ सकता है।',
+        errEmptyLink: 'कृपया ज़ूम मीटिंग लिंक पेस्ट करें।',
+        errEmptyName: 'कृपया व्यक्ति का नाम लिखें।',
+        errInvalidUrl: 'कृपया मान्य Zoom URL दर्ज करें।',
+        errNotZoom: 'कृपया मान्य zoom.us मीटिंग लिंक दर्ज करें।',
+        errCopy: 'आपके ब्राउज़र ने कॉपी करने से रोक दिया है। कृपया लिंक को चुनकर मैन्युअली कॉपी करें।'
+      }
+    };
+
     const meeting = document.getElementById('meeting');
     const person = document.getElementById('person');
     const output = document.getElementById('output');
     const generatedEl = document.getElementById('generated');
+    const copyBtn = document.getElementById('copy');
+    const shareBtn = document.getElementById('share');
+    const langButtons = document.querySelectorAll('.lang-btn');
+
+    let currentLang = localStorage.getItem('zoomGenLang') || 'en';
+    if (!translations[currentLang]) currentLang = 'en';
     let generatedUrl = '';
+    let isCopied = false;
+
+    function applyLanguage(lang) {
+      currentLang = translations[lang] ? lang : 'en';
+      localStorage.setItem('zoomGenLang', currentLang);
+      const t = translations[currentLang];
+
+      document.documentElement.lang = currentLang;
+      document.title = t.pageTitle;
+      document.getElementById('title').textContent = t.title;
+      document.getElementById('subtitle').textContent = t.subtitle;
+      document.getElementById('labelMeeting').textContent = t.labelMeeting;
+      meeting.placeholder = t.placeholderMeeting;
+      document.getElementById('labelPerson').textContent = t.labelPerson;
+      person.placeholder = t.placeholderPerson;
+      document.getElementById('hintName').innerHTML = t.hintName;
+      document.getElementById('generate').textContent = t.generate;
+      document.getElementById('resultTitle').textContent = t.resultTitle;
+      copyBtn.textContent = isCopied ? t.copied : t.copy;
+      shareBtn.textContent = t.share;
+      document.getElementById('noticeText').innerHTML = t.notice;
+
+      if (generatedUrl) {
+        shareBtn.href = 'https://wa.me/?text=' + encodeURIComponent(t.waPrefix + generatedUrl);
+      }
+
+      langButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      });
+    }
 
     function buildLink() {
+      const t = translations[currentLang];
       const raw = meeting.value.trim();
       const name = person.value.trim();
-      if (!raw) { alert('Please paste your Zoom meeting link.'); meeting.focus(); return; }
-      if (!name) { alert("Please enter the person's name."); person.focus(); return; }
+
+      if (!raw) { alert(t.errEmptyLink); meeting.focus(); return; }
+      if (!name) { alert(t.errEmptyName); person.focus(); return; }
 
       let parsed;
       try { parsed = new URL(raw); }
-      catch { alert('Please enter a valid Zoom URL.'); meeting.focus(); return; }
+      catch { alert(t.errInvalidUrl); meeting.focus(); return; }
 
       if (!/^https?:$/.test(parsed.protocol) || !/(^|\.)zoom\.us$/i.test(parsed.hostname)) {
-        alert('Please enter a valid zoom.us meeting link.');
+        alert(t.errNotZoom);
         meeting.focus(); return;
       }
 
       parsed.searchParams.set('uname', name);
       generatedUrl = parsed.toString();
       generatedEl.textContent = generatedUrl;
-      document.getElementById('share').href =
-        'https://wa.me/?text=' + encodeURIComponent('Join Zoom Meeting:\n' + generatedUrl);
+      shareBtn.href = 'https://wa.me/?text=' + encodeURIComponent(t.waPrefix + generatedUrl);
       output.classList.remove('hidden');
     }
 
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+    });
+
     document.getElementById('generate').addEventListener('click', buildLink);
-    document.getElementById('copy').addEventListener('click', async () => {
+
+    copyBtn.addEventListener('click', async () => {
       if (!generatedUrl) return;
+      const t = translations[currentLang];
       try {
         await navigator.clipboard.writeText(generatedUrl);
-        document.getElementById('copy').textContent = 'Copied!';
-        setTimeout(() => document.getElementById('copy').textContent = 'Copy Zoom Link', 1800);
+        isCopied = true;
+        copyBtn.textContent = t.copied;
+        setTimeout(() => {
+          isCopied = false;
+          copyBtn.textContent = translations[currentLang].copy;
+        }, 1800);
       } catch {
-        alert('Copy was blocked by your browser. Please select and copy the link manually.');
+        alert(t.errCopy);
       }
     });
+
     [meeting, person].forEach(el => el.addEventListener('keydown', e => {
       if (e.key === 'Enter') buildLink();
     }));
+
+    applyLanguage(currentLang);
   </script>
 </body>
 </html>
