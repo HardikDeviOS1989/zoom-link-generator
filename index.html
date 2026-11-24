@@ -99,7 +99,7 @@
       try { parsed = new URL(raw); }
       catch { alert('Please enter a valid Zoom URL.'); meeting.focus(); return; }
 
-      if (!/^https?:$/.test(parsed.protocol) || !/(^|\\.)zoom\\.us$/i.test(parsed.hostname)) {
+      if (!/^https?:$/.test(parsed.protocol) || !/(^|\.)zoom\.us$/i.test(parsed.hostname)) {
         alert('Please enter a valid zoom.us meeting link.');
         meeting.focus(); return;
       }
@@ -108,7 +108,7 @@
       generatedUrl = parsed.toString();
       generatedEl.textContent = generatedUrl;
       document.getElementById('share').href =
-        'https://wa.me/?text=' + encodeURIComponent('Join Zoom Meeting:\\n' + generatedUrl);
+        'https://wa.me/?text=' + encodeURIComponent('Join Zoom Meeting:\n' + generatedUrl);
       output.classList.remove('hidden');
     }
 
